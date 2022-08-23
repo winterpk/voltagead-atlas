@@ -33,9 +33,9 @@ export default function Header({ className }) {
               <a title="Home">
                 <Image
                   src="/logo.png"
-                  width={400}
-                  height={80}
-                  alt="Blueprint media logo"
+                  width={560}
+                  height={188}
+                  alt="VoltageAD logo"
                   layout="responsive"
                 />
               </a>
