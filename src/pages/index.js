@@ -19,6 +19,7 @@ import { pageTitle } from 'utils';
 const postsPerPage = 3;
 
 export default function Page() {
+
   const { useQuery, usePosts } = client;
   const generalSettings = useQuery().generalSettings;
   const posts = usePosts({

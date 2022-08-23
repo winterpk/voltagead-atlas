@@ -1,5 +1,6 @@
 import { client } from 'client';
 import Link from 'next/link';
+import React from 'react';
 /**
  * A navigation menu component.
  * @param {Props} props The props object.
@@ -37,11 +38,12 @@ export default function NavigationMenu({ className, menuLocation, children }) {
       aria-label={`${menuItems[0]?.menu.node.name} menu`}
     >
       <ul className="menu">
-        {menuItems.map((item) => {
+        {menuItems.map((item, index) => {
           const { id, path, label } = item;
+          const animationOrder = { "--animation-order": index };
           return (
             <li key={id ?? ''}>
-              <Link href={path ?? ''}>{label ?? ''}</Link>
+              <Link href={path ?? ''} ><a style={animationOrder} className="uppercase text-[22px] font-extralight text-white font-degular">{label ?? ''}</a></Link>
             </li>
           );
         })}

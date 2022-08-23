@@ -2,8 +2,14 @@
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
 @use 'sass:math';
 
+// Import tailwind
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import 'Variables';
 @import 'Base';
+@import 'Fonts';
 @import 'Spacing';
 @import 'Typography';
 @import 'Grid';

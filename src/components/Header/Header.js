@@ -2,11 +2,12 @@ import * as MENUS from 'constants/menus';
 
 import { classNames as cn } from 'utils';
 import { useState } from 'react';
-import { FaBars, FaSearch } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
 import { NavigationMenu, SkipNavigationLink } from 'components';
 
+// import Velocity from 'velocity-animate';
 import styles from './Header.module.scss';
 /**
  * A Header component
@@ -16,55 +17,54 @@ import styles from './Header.module.scss';
  */
 export default function Header({ className }) {
   const [isNavShown, setIsNavShown] = useState(false);
-
   const headerClasses = cn([styles.header, className]);
   const navClasses = cn([
     styles['primary-navigation'],
     isNavShown ? styles['show'] : undefined,
+    // styles['show'],
   ]);
 
+  const handleMouseOver = () => {
+    setIsNavShown(true)
+  }
+
+  const handleMouseOut = () => {
+    setIsNavShown(false)
+  }
+
   return (
-    <header className={headerClasses}>
+    <header
+      className={headerClasses}
+      onMouseOver={handleMouseOver}
+      onMouseOut={handleMouseOut}
+    >
       <SkipNavigationLink />
-      <div className="container">
-        <div className={styles['bar']}>
-          <div className={styles['logo']}>
-            <Link href="/">
-              <a title="Home">
-                <Image
-                  src="/logo.png"
-                  width={560}
-                  height={188}
-                  alt="VoltageAD logo"
-                  layout="responsive"
-                />
+      <div>
+        <div className={styles['logo']}>
+          <Link href="/">
+            <a title="Home" className="uppercase text-[22px] font-thin">
+              <Image
+                src="/voltage-bolt.jpg"
+                width={50}
+                height={50}
+                alt="VoltageAD logo"
+                layout="responsive"
+              />
+            </a>
+          </Link>
+        </div>
+        <NavigationMenu
+          className={navClasses}
+          menuLocation={MENUS.PRIMARY_LOCATION}
+        >
+          <li className={styles['search-icon']}>
+            <Link href="/search">
+              <a className="text-white">
+                <FaSearch title="Search" role="img" />
               </a>
             </Link>
-          </div>
-          <button
-            type="button"
-            className={styles['nav-toggle']}
-            onClick={() => setIsNavShown(!isNavShown)}
-            aria-label="Toggle navigation"
-            aria-controls={styles['primary-navigation']}
-            aria-expanded={isNavShown}
-          >
-            <FaBars />
-          </button>
-          <NavigationMenu
-            id={styles['primary-navigation']}
-            className={navClasses}
-            menuLocation={MENUS.PRIMARY_LOCATION}
-          >
-            <li>
-              <Link href="/search">
-                <a>
-                  <FaSearch title="Search" role="img" />
-                </a>
-              </Link>
-            </li>
-          </NavigationMenu>
-        </div>
+          </li>
+        </NavigationMenu>
       </div>
     </header>
   );

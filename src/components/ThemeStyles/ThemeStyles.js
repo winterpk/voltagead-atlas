@@ -10,7 +10,7 @@ const themes = {
   },
   red: {
     '--color-black': '#000',
-    '--color-primary': '#660000',
+    '--color-primary': '#ed1c24',
     '--color-secondary': '#B50505',
     '--color-tertiary': '#CCCCCC',
     '--color-white': '#FFFFFF',

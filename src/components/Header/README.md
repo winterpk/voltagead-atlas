@@ -4,7 +4,7 @@ Renders the page header including the site's logo and primary navigation.
 
 The navigation menu is sourced from the "Primary" menu location in WordPress. If no menu is assigned to that location, none will be shown. Menu depth is currently limited to one level.
 
-The site logo is pulled from `/public/logo.png`.
+The site logo is pulled from `/public/voltage-bolt.png`.
 
 ## Usage
 
