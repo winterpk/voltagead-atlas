@@ -465,13 +465,13 @@ export interface CreateCommentInput {
   authorUrl?: InputMaybe<Scalars['String']>;
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']>;
-  /** The ID of the post object the comment belongs to. */
+  /** The database ID of the post object the comment belongs to. */
   commentOn?: InputMaybe<Scalars['Int']>;
   /** Content of the comment. */
   content?: InputMaybe<Scalars['String']>;
   /** The date of the object. Preferable to enter as year/month/day ( e.g. 01/31/2017 ) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
   date?: InputMaybe<Scalars['String']>;
-  /** Parent comment of current comment. */
+  /** Parent comment ID of current comment. */
   parent?: InputMaybe<Scalars['ID']>;
   /** Type of comment. */
   type?: InputMaybe<Scalars['String']>;
@@ -499,7 +499,7 @@ export interface CreateMediaItemInput {
   filePath?: InputMaybe<Scalars['String']>;
   /** The file type of the mediaItem */
   fileType?: InputMaybe<MimeTypeEnum>;
-  /** The WordPress post ID or the graphQL postId of the parent object */
+  /** The ID of the parent object */
   parentId?: InputMaybe<Scalars['ID']>;
   /** The ping status for the mediaItem */
   pingStatus?: InputMaybe<Scalars['String']>;
@@ -982,8 +982,12 @@ export type MenuNodeIdTypeEnum =
   | 'DATABASE_ID'
   /** Identify a menu node by the (hashed) Global ID. */
   | 'ID'
-  /** Identify a menu node by it's name */
-  | 'NAME';
+  /** Identify a menu node by the slug of menu location to which it is assigned */
+  | 'LOCATION'
+  /** Identify a menu node by its name */
+  | 'NAME'
+  /** Identify a menu node by its slug */
+  | 'SLUG';
 
 /** Arguments for filtering the MenuToMenuItemConnection connection */
 export interface MenuToMenuItemConnectionWhereArgs {
@@ -1302,6 +1306,23 @@ export interface PageToRevisionConnectionWhereArgs {
   title?: InputMaybe<Scalars['String']>;
 }
 
+/** The status of the WordPress plugin. */
+export type PluginStatusEnum =
+  /** The plugin is currently active. */
+  | 'ACTIVE'
+  /** The plugin is a drop-in plugin. */
+  | 'DROP_IN'
+  /** The plugin is currently inactive. */
+  | 'INACTIVE'
+  /** The plugin is a must-use plugin. */
+  | 'MUST_USE'
+  /** The plugin is technically active but was paused while loading. */
+  | 'PAUSED'
+  /** The plugin was active recently. */
+  | 'RECENTLY_ACTIVE'
+  /** The plugin has an upgrade available. */
+  | 'UPGRADE';
+
 /** Set relationships between the post to categories */
 export interface PostCategoriesInput {
   /** If true, this will append the category to existing related categories. If false, this will replace existing relationships. Default true. */
@@ -1454,9 +1475,9 @@ export type PostIdType =
 
 /** The format of post field data. */
 export type PostObjectFieldFormatEnum =
-  /** Provide the field value directly from database */
+  /** Provide the field value directly from database. Null on unauthenticated requests. */
   | 'RAW'
-  /** Apply the default WordPress rendering */
+  /** Provide the field value as rendered by WordPress. Default. */
   | 'RENDERED';
 
 /** The column to use when filtering by date */
@@ -1519,6 +1540,8 @@ export interface PostPostFormatsNodeInput {
 
 /** The status of the object. */
 export type PostStatusEnum =
+  /** Objects with the acf-disabled status */
+  | 'ACF_DISABLED'
   /** Objects with the auto-draft status */
   | 'AUTO_DRAFT'
   /** Objects with the draft status */
@@ -2235,6 +2258,16 @@ export interface RootQueryToPageConnectionWhereArgs {
   title?: InputMaybe<Scalars['String']>;
 }
 
+/** Arguments for filtering the RootQueryToPluginConnection connection */
+export interface RootQueryToPluginConnectionWhereArgs {
+  /** Show plugin based on a keyword search. */
+  search?: InputMaybe<Scalars['String']>;
+  /** Retrieve plugins where plugin status is in an array. */
+  stati?: InputMaybe<Array<InputMaybe<PluginStatusEnum>>>;
+  /** Show plugins with a specific status. */
+  status?: InputMaybe<PluginStatusEnum>;
+}
+
 /** Arguments for filtering the RootQueryToPostConnection connection */
 export interface RootQueryToPostConnectionWhereArgs {
   /** The user that's connected as the author of the object. Use the userId for the author object. */
@@ -2674,7 +2707,7 @@ export interface UpdateCommentInput {
   authorUrl?: InputMaybe<Scalars['String']>;
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']>;
-  /** The ID of the post object the comment belongs to. */
+  /** The database ID of the post object the comment belongs to. */
   commentOn?: InputMaybe<Scalars['Int']>;
   /** Content of the comment. */
   content?: InputMaybe<Scalars['String']>;
@@ -2682,7 +2715,7 @@ export interface UpdateCommentInput {
   date?: InputMaybe<Scalars['String']>;
   /** The ID of the comment being updated. */
   id: Scalars['ID'];
-  /** Parent comment of current comment. */
+  /** Parent comment ID of current comment. */
   parent?: InputMaybe<Scalars['ID']>;
   /** Type of comment. */
   type?: InputMaybe<Scalars['String']>;
@@ -2712,7 +2745,7 @@ export interface UpdateMediaItemInput {
   fileType?: InputMaybe<MimeTypeEnum>;
   /** The ID of the mediaItem object */
   id: Scalars['ID'];
-  /** The WordPress post ID or the graphQL postId of the parent object */
+  /** The ID of the parent object */
   parentId?: InputMaybe<Scalars['ID']>;
   /** The ping status for the mediaItem */
   pingStatus?: InputMaybe<Scalars['String']>;
@@ -2810,6 +2843,7 @@ export interface UpdatePostInput {
 
 /** Input for the updateSettings mutation */
 export interface UpdateSettingsInput {
+  /** Opt into anonymous usage tracking to help us make Atlas Content Modeler better. */
   atlasContentModelerSettingsSettingsAtlasContentModelerUsageTracking?: InputMaybe<
     Scalars['String']
   >;
@@ -2837,8 +2871,14 @@ export interface UpdateSettingsInput {
   generalSettingsTitle?: InputMaybe<Scalars['String']>;
   /** Site URL. */
   generalSettingsUrl?: InputMaybe<Scalars['String']>;
+  /** The ID of the page that should display the latest posts */
+  readingSettingsPageForPosts?: InputMaybe<Scalars['Int']>;
+  /** The ID of the page that should be displayed on the front page */
+  readingSettingsPageOnFront?: InputMaybe<Scalars['Int']>;
   /** Blog pages show at most. */
   readingSettingsPostsPerPage?: InputMaybe<Scalars['Int']>;
+  /** What to show on the front page */
+  readingSettingsShowOnFront?: InputMaybe<Scalars['String']>;
   /** Default post category. */
   writingSettingsDefaultCategory?: InputMaybe<Scalars['Int']>;
   /** Default post format. */
@@ -3233,6 +3273,11 @@ export type UsersConnectionSearchColumnEnum =
 
 export declare const scalarsEnumsHash: import('gqty').ScalarsEnumsHash;
 export declare const generatedSchema: {
+  AcfFieldGroup: {
+    __typename: { __type: 'String!' };
+    fieldGroupName: { __type: 'String' };
+    $on: { __type: '$AcfFieldGroup!' };
+  };
   AtlasContentModelerSettingsSettings: {
     __typename: { __type: 'String!' };
     atlasContentModelerUsageTracking: { __type: 'String' };
@@ -4109,6 +4154,23 @@ export declare const generatedSchema: {
     code: { __type: 'String' };
     error: { __type: 'String' };
   };
+  GlobalSettings: {
+    __typename: { __type: 'String!' };
+    pageSlug: { __type: 'String' };
+    pageTitle: { __type: 'String' };
+    social: { __type: 'GlobalSettings_Social' };
+  };
+  GlobalSettings_Social: {
+    __typename: { __type: 'String!' };
+    fieldGroupName: { __type: 'String' };
+    socialLinks: { __type: '[GlobalSettings_Social_socialLinks]' };
+  };
+  GlobalSettings_Social_socialLinks: {
+    __typename: { __type: 'String!' };
+    fieldGroupName: { __type: 'String' };
+    network: { __type: 'String' };
+    url: { __type: 'String' };
+  };
   HierarchicalContentNode: {
     __typename: { __type: 'String!' };
     ancestors: {
@@ -4439,6 +4501,7 @@ export declare const generatedSchema: {
     path: { __type: 'String' };
     target: { __type: 'String' };
     title: { __type: 'String' };
+    uri: { __type: 'String' };
     url: { __type: 'String' };
   };
   MenuItemLinkable: {
@@ -5350,7 +5413,10 @@ export declare const generatedSchema: {
   };
   ReadingSettings: {
     __typename: { __type: 'String!' };
+    pageForPosts: { __type: 'Int' };
+    pageOnFront: { __type: 'Int' };
     postsPerPage: { __type: 'Int' };
+    showOnFront: { __type: 'String' };
   };
   RegisterUserInput: {
     aim: { __type: 'String' };
@@ -5679,6 +5745,11 @@ export declare const generatedSchema: {
     cursor: { __type: 'String' };
     node: { __type: 'Plugin' };
   };
+  RootQueryToPluginConnectionWhereArgs: {
+    search: { __type: 'String' };
+    stati: { __type: '[PluginStatusEnum]' };
+    status: { __type: 'PluginStatusEnum' };
+  };
   RootQueryToPostConnection: {
     __typename: { __type: 'String!' };
     edges: { __type: '[RootQueryToPostConnectionEdge]' };
@@ -5909,7 +5980,10 @@ export declare const generatedSchema: {
     generalSettingsTimezone: { __type: 'String' };
     generalSettingsTitle: { __type: 'String' };
     generalSettingsUrl: { __type: 'String' };
+    readingSettingsPageForPosts: { __type: 'Int' };
+    readingSettingsPageOnFront: { __type: 'Int' };
     readingSettingsPostsPerPage: { __type: 'Int' };
+    readingSettingsShowOnFront: { __type: 'String' };
     writingSettingsDefaultCategory: { __type: 'Int' };
     writingSettingsDefaultPostFormat: { __type: 'String' };
     writingSettingsUseSmilies: { __type: 'Boolean' };
@@ -6078,22 +6152,6 @@ export declare const generatedSchema: {
     __typename: { __type: 'String!' };
     cursor: { __type: 'String' };
     node: { __type: 'ContentType' };
-  };
-  Template_Blank: {
-    __typename: { __type: 'String!' };
-    templateName: { __type: 'String' };
-  };
-  Template_PageLargeHeader: {
-    __typename: { __type: 'String!' };
-    templateName: { __type: 'String' };
-  };
-  Template_PageNoSeparators: {
-    __typename: { __type: 'String!' };
-    templateName: { __type: 'String' };
-  };
-  Template_SinglePostNoSeparators: {
-    __typename: { __type: 'String!' };
-    templateName: { __type: 'String' };
   };
   TermNode: {
     __typename: { __type: 'String!' };
@@ -6298,7 +6356,10 @@ export declare const generatedSchema: {
     generalSettingsTimezone: { __type: 'String' };
     generalSettingsTitle: { __type: 'String' };
     generalSettingsUrl: { __type: 'String' };
+    readingSettingsPageForPosts: { __type: 'Int' };
+    readingSettingsPageOnFront: { __type: 'Int' };
     readingSettingsPostsPerPage: { __type: 'Int' };
+    readingSettingsShowOnFront: { __type: 'String' };
     writingSettingsDefaultCategory: { __type: 'Int' };
     writingSettingsDefaultPostFormat: { __type: 'String' };
     writingSettingsUseSmilies: { __type: 'Boolean' };
@@ -6877,6 +6938,7 @@ export declare const generatedSchema: {
     };
     discussionSettings: { __type: 'DiscussionSettings' };
     generalSettings: { __type: 'GeneralSettings' };
+    globalSettings: { __type: 'GlobalSettings' };
     mediaItem: {
       __type: 'MediaItem';
       __args: { asPreview: 'Boolean'; id: 'ID!'; idType: 'MediaItemIdType' };
@@ -6949,7 +7011,13 @@ export declare const generatedSchema: {
     plugin: { __type: 'Plugin'; __args: { id: 'ID!' } };
     plugins: {
       __type: 'RootQueryToPluginConnection';
-      __args: { after: 'String'; before: 'String'; first: 'Int'; last: 'Int' };
+      __args: {
+        after: 'String';
+        before: 'String';
+        first: 'Int';
+        last: 'Int';
+        where: 'RootQueryToPluginConnectionWhereArgs';
+      };
     };
     post: {
       __type: 'Post';
@@ -7115,14 +7183,12 @@ export declare const generatedSchema: {
     ];
     Commenter: ['CommentAuthor', 'User'];
     ContentRevisionUnion: ['Page', 'Post'];
-    ContentTemplate: [
-      'DefaultTemplate',
-      'Template_Blank',
-      'Template_PageLargeHeader',
-      'Template_PageNoSeparators',
-      'Template_SinglePostNoSeparators'
-    ];
+    ContentTemplate: ['DefaultTemplate'];
     EnqueuedAsset: ['EnqueuedScript', 'EnqueuedStylesheet'];
+    AcfFieldGroup: [
+      'GlobalSettings_Social',
+      'GlobalSettings_Social_socialLinks'
+    ];
     ContentNode: ['MediaItem', 'Page', 'Post'];
     HierarchicalContentNode: ['MediaItem', 'Page'];
     NodeWithAuthor: ['MediaItem', 'Page', 'Post'];
@@ -7140,12 +7206,24 @@ export declare const generatedSchema: {
 };
 
 /**
+ * A Field Group registered by ACF
+ */
+export interface AcfFieldGroup {
+  __typename?: 'GlobalSettings_Social' | 'GlobalSettings_Social_socialLinks';
+  /**
+   * The name of the ACF Field Group
+   */
+  fieldGroupName?: Maybe<ScalarsEnums['String']>;
+  $on: $AcfFieldGroup;
+}
+
+/**
  * The atlasContentModelerSettings setting type
  */
 export interface AtlasContentModelerSettingsSettings {
   __typename?: 'AtlasContentModelerSettingsSettings';
   /**
-   * The string Settings Group
+   * Opt into anonymous usage tracking to help us make Atlas Content Modeler better.
    */
   atlasContentModelerUsageTracking?: Maybe<ScalarsEnums['String']>;
 }
@@ -8234,12 +8312,7 @@ export interface ContentRevisionUnion {
  * The template assigned to a node of content
  */
 export interface ContentTemplate {
-  __typename?:
-    | 'DefaultTemplate'
-    | 'Template_Blank'
-    | 'Template_PageLargeHeader'
-    | 'Template_PageNoSeparators'
-    | 'Template_SinglePostNoSeparators';
+  __typename?: 'DefaultTemplate';
   /**
    * The name of the template
    */
@@ -8983,6 +9056,47 @@ export interface GenerateAuthorizationCodePayload {
    * Error encountered during user authentication, if any
    */
   error?: Maybe<ScalarsEnums['String']>;
+}
+
+/**
+ * Global Settings options.
+ */
+export interface GlobalSettings {
+  __typename?: 'GlobalSettings';
+  pageSlug?: Maybe<ScalarsEnums['String']>;
+  pageTitle?: Maybe<ScalarsEnums['String']>;
+  /**
+   * Added to the GraphQL Schema because the ACF Field Group &quot;Social&quot; was set to Show in GraphQL.
+   */
+  social?: Maybe<GlobalSettings_Social>;
+}
+
+/**
+ * Field Group
+ */
+export interface GlobalSettings_Social {
+  __typename?: 'GlobalSettings_Social';
+  /**
+   * The name of the ACF Field Group
+   */
+  fieldGroupName?: Maybe<ScalarsEnums['String']>;
+  /**
+   * Add social links
+   */
+  socialLinks?: Maybe<Array<Maybe<GlobalSettings_Social_socialLinks>>>;
+}
+
+/**
+ * Field Group
+ */
+export interface GlobalSettings_Social_socialLinks {
+  __typename?: 'GlobalSettings_Social_socialLinks';
+  /**
+   * The name of the ACF Field Group
+   */
+  fieldGroupName?: Maybe<ScalarsEnums['String']>;
+  network?: Maybe<ScalarsEnums['String']>;
+  url?: Maybe<ScalarsEnums['String']>;
 }
 
 /**
@@ -9819,6 +9933,10 @@ export interface MenuItem {
    * Title attribute for the menu item link
    */
   title?: Maybe<ScalarsEnums['String']>;
+  /**
+   * The uri of the resource the menu item links to
+   */
+  uri?: Maybe<ScalarsEnums['String']>;
   /**
    * URL or destination of the menu item.
    */
@@ -11751,9 +11869,21 @@ export interface PostTypeLabelDetails {
 export interface ReadingSettings {
   __typename?: 'ReadingSettings';
   /**
+   * The ID of the page that should display the latest posts
+   */
+  pageForPosts?: Maybe<ScalarsEnums['Int']>;
+  /**
+   * The ID of the page that should be displayed on the front page
+   */
+  pageOnFront?: Maybe<ScalarsEnums['Int']>;
+  /**
    * Blog pages show at most.
    */
   postsPerPage?: Maybe<ScalarsEnums['Int']>;
+  /**
+   * What to show on the front page
+   */
+  showOnFront?: Maybe<ScalarsEnums['String']>;
 }
 
 /**
@@ -12558,7 +12688,19 @@ export interface Settings {
   /**
    * Settings of the the integer Settings Group
    */
+  readingSettingsPageForPosts?: Maybe<ScalarsEnums['Int']>;
+  /**
+   * Settings of the the integer Settings Group
+   */
+  readingSettingsPageOnFront?: Maybe<ScalarsEnums['Int']>;
+  /**
+   * Settings of the the integer Settings Group
+   */
   readingSettingsPostsPerPage?: Maybe<ScalarsEnums['Int']>;
+  /**
+   * Settings of the the string Settings Group
+   */
+  readingSettingsShowOnFront?: Maybe<ScalarsEnums['String']>;
   /**
    * Settings of the the integer Settings Group
    */
@@ -12957,50 +13099,6 @@ export interface TaxonomyToContentTypeConnectionEdge {
    * The item at the end of the edge
    */
   node?: Maybe<ContentType>;
-}
-
-/**
- * The template assigned to the node
- */
-export interface Template_Blank {
-  __typename?: 'Template_Blank';
-  /**
-   * The name of the template
-   */
-  templateName?: Maybe<ScalarsEnums['String']>;
-}
-
-/**
- * The template assigned to the node
- */
-export interface Template_PageLargeHeader {
-  __typename?: 'Template_PageLargeHeader';
-  /**
-   * The name of the template
-   */
-  templateName?: Maybe<ScalarsEnums['String']>;
-}
-
-/**
- * The template assigned to the node
- */
-export interface Template_PageNoSeparators {
-  __typename?: 'Template_PageNoSeparators';
-  /**
-   * The name of the template
-   */
-  templateName?: Maybe<ScalarsEnums['String']>;
-}
-
-/**
- * The template assigned to the node
- */
-export interface Template_SinglePostNoSeparators {
-  __typename?: 'Template_SinglePostNoSeparators';
-  /**
-   * The name of the template
-   */
-  templateName?: Maybe<ScalarsEnums['String']>;
 }
 
 /**
@@ -14198,6 +14296,7 @@ export interface Query {
   }) => Maybe<RootQueryToContentTypeConnection>;
   discussionSettings?: Maybe<DiscussionSettings>;
   generalSettings?: Maybe<GeneralSettings>;
+  globalSettings?: Maybe<GlobalSettings>;
   mediaItem: (args: {
     asPreview?: Maybe<Scalars['Boolean']>;
     id: Scalars['ID'];
@@ -14265,6 +14364,7 @@ export interface Query {
     before?: Maybe<Scalars['String']>;
     first?: Maybe<Scalars['Int']>;
     last?: Maybe<Scalars['Int']>;
+    where?: Maybe<RootQueryToPluginConnectionWhereArgs>;
   }) => Maybe<RootQueryToPluginConnection>;
   post: (args: {
     asPreview?: Maybe<Scalars['Boolean']>;
@@ -14434,6 +14534,9 @@ export interface SchemaObjectTypes {
   EnqueuedStylesheet: EnqueuedStylesheet;
   GeneralSettings: GeneralSettings;
   GenerateAuthorizationCodePayload: GenerateAuthorizationCodePayload;
+  GlobalSettings: GlobalSettings;
+  GlobalSettings_Social: GlobalSettings_Social;
+  GlobalSettings_Social_socialLinks: GlobalSettings_Social_socialLinks;
   HierarchicalContentNodeToContentNodeAncestorsConnection: HierarchicalContentNodeToContentNodeAncestorsConnection;
   HierarchicalContentNodeToContentNodeAncestorsConnectionEdge: HierarchicalContentNodeToContentNodeAncestorsConnectionEdge;
   HierarchicalContentNodeToContentNodeChildrenConnection: HierarchicalContentNodeToContentNodeChildrenConnection;
@@ -14542,10 +14645,6 @@ export interface SchemaObjectTypes {
   Taxonomy: Taxonomy;
   TaxonomyToContentTypeConnection: TaxonomyToContentTypeConnection;
   TaxonomyToContentTypeConnectionEdge: TaxonomyToContentTypeConnectionEdge;
-  Template_Blank: Template_Blank;
-  Template_PageLargeHeader: Template_PageLargeHeader;
-  Template_PageNoSeparators: Template_PageNoSeparators;
-  Template_SinglePostNoSeparators: Template_SinglePostNoSeparators;
   TermNodeToEnqueuedScriptConnection: TermNodeToEnqueuedScriptConnection;
   TermNodeToEnqueuedScriptConnectionEdge: TermNodeToEnqueuedScriptConnectionEdge;
   TermNodeToEnqueuedStylesheetConnection: TermNodeToEnqueuedStylesheetConnection;
@@ -14637,6 +14736,9 @@ export type SchemaObjectTypesNames =
   | 'EnqueuedStylesheet'
   | 'GeneralSettings'
   | 'GenerateAuthorizationCodePayload'
+  | 'GlobalSettings'
+  | 'GlobalSettings_Social'
+  | 'GlobalSettings_Social_socialLinks'
   | 'HierarchicalContentNodeToContentNodeAncestorsConnection'
   | 'HierarchicalContentNodeToContentNodeAncestorsConnectionEdge'
   | 'HierarchicalContentNodeToContentNodeChildrenConnection'
@@ -14745,10 +14847,6 @@ export type SchemaObjectTypesNames =
   | 'Taxonomy'
   | 'TaxonomyToContentTypeConnection'
   | 'TaxonomyToContentTypeConnectionEdge'
-  | 'Template_Blank'
-  | 'Template_PageLargeHeader'
-  | 'Template_PageNoSeparators'
-  | 'Template_SinglePostNoSeparators'
   | 'TermNodeToEnqueuedScriptConnection'
   | 'TermNodeToEnqueuedScriptConnectionEdge'
   | 'TermNodeToEnqueuedStylesheetConnection'
@@ -14784,6 +14882,11 @@ export type SchemaObjectTypesNames =
   | 'WPPageInfo'
   | 'WritingSettings';
 
+export interface $AcfFieldGroup {
+  GlobalSettings_Social?: GlobalSettings_Social;
+  GlobalSettings_Social_socialLinks?: GlobalSettings_Social_socialLinks;
+}
+
 export interface $Commenter {
   CommentAuthor?: CommentAuthor;
   User?: User;
@@ -14802,10 +14905,6 @@ export interface $ContentRevisionUnion {
 
 export interface $ContentTemplate {
   DefaultTemplate?: DefaultTemplate;
-  Template_Blank?: Template_Blank;
-  Template_PageLargeHeader?: Template_PageLargeHeader;
-  Template_PageNoSeparators?: Template_PageNoSeparators;
-  Template_SinglePostNoSeparators?: Template_SinglePostNoSeparators;
 }
 
 export interface $DatabaseIdentifier {
@@ -14967,6 +15066,7 @@ export interface ScalarsEnums extends MakeNullable<Scalars> {
   MimeTypeEnum: MimeTypeEnum | undefined;
   OrderEnum: OrderEnum | undefined;
   PageIdType: PageIdType | undefined;
+  PluginStatusEnum: PluginStatusEnum | undefined;
   PostFormatIdType: PostFormatIdType | undefined;
   PostIdType: PostIdType | undefined;
   PostObjectFieldFormatEnum: PostObjectFieldFormatEnum | undefined;

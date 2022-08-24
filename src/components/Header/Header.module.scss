@@ -46,9 +46,9 @@
       opacity: 0;
       animation-name: navItemIn;
       // animation-delay: 400ms;
-      animation-duration: .4s;
+      animation-duration: .25s;
       // animation-delay: .4s;
-      animation-delay: calc(var(--animation-order) * .2s);
+      animation-delay: calc(var(--animation-order) * .12s);
       animation-fill-mode: forwards;
       animation-timing-function: cubic-bezier(.02, .01, .47, 1);
     }

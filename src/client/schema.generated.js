@@ -29,6 +29,7 @@ export const scalarsEnumsHash = {
   MimeTypeEnum: true,
   OrderEnum: true,
   PageIdType: true,
+  PluginStatusEnum: true,
   PostFormatIdType: true,
   PostIdType: true,
   PostObjectFieldFormatEnum: true,
@@ -49,6 +50,11 @@ export const scalarsEnumsHash = {
 };
 
 export const generatedSchema = {
+  AcfFieldGroup: {
+    __typename: { __type: 'String!' },
+    fieldGroupName: { __type: 'String' },
+    $on: { __type: '$AcfFieldGroup!' },
+  },
   AtlasContentModelerSettingsSettings: {
     __typename: { __type: 'String!' },
     atlasContentModelerUsageTracking: { __type: 'String' },
@@ -925,6 +931,23 @@ export const generatedSchema = {
     code: { __type: 'String' },
     error: { __type: 'String' },
   },
+  GlobalSettings: {
+    __typename: { __type: 'String!' },
+    pageSlug: { __type: 'String' },
+    pageTitle: { __type: 'String' },
+    social: { __type: 'GlobalSettings_Social' },
+  },
+  GlobalSettings_Social: {
+    __typename: { __type: 'String!' },
+    fieldGroupName: { __type: 'String' },
+    socialLinks: { __type: '[GlobalSettings_Social_socialLinks]' },
+  },
+  GlobalSettings_Social_socialLinks: {
+    __typename: { __type: 'String!' },
+    fieldGroupName: { __type: 'String' },
+    network: { __type: 'String' },
+    url: { __type: 'String' },
+  },
   HierarchicalContentNode: {
     __typename: { __type: 'String!' },
     ancestors: {
@@ -1259,6 +1282,7 @@ export const generatedSchema = {
     path: { __type: 'String' },
     target: { __type: 'String' },
     title: { __type: 'String' },
+    uri: { __type: 'String' },
     url: { __type: 'String' },
   },
   MenuItemLinkable: {
@@ -2172,7 +2196,10 @@ export const generatedSchema = {
   },
   ReadingSettings: {
     __typename: { __type: 'String!' },
+    pageForPosts: { __type: 'Int' },
+    pageOnFront: { __type: 'Int' },
     postsPerPage: { __type: 'Int' },
+    showOnFront: { __type: 'String' },
   },
   RegisterUserInput: {
     aim: { __type: 'String' },
@@ -2501,6 +2528,11 @@ export const generatedSchema = {
     cursor: { __type: 'String' },
     node: { __type: 'Plugin' },
   },
+  RootQueryToPluginConnectionWhereArgs: {
+    search: { __type: 'String' },
+    stati: { __type: '[PluginStatusEnum]' },
+    status: { __type: 'PluginStatusEnum' },
+  },
   RootQueryToPostConnection: {
     __typename: { __type: 'String!' },
     edges: { __type: '[RootQueryToPostConnectionEdge]' },
@@ -2731,7 +2763,10 @@ export const generatedSchema = {
     generalSettingsTimezone: { __type: 'String' },
     generalSettingsTitle: { __type: 'String' },
     generalSettingsUrl: { __type: 'String' },
+    readingSettingsPageForPosts: { __type: 'Int' },
+    readingSettingsPageOnFront: { __type: 'Int' },
     readingSettingsPostsPerPage: { __type: 'Int' },
+    readingSettingsShowOnFront: { __type: 'String' },
     writingSettingsDefaultCategory: { __type: 'Int' },
     writingSettingsDefaultPostFormat: { __type: 'String' },
     writingSettingsUseSmilies: { __type: 'Boolean' },
@@ -2900,22 +2935,6 @@ export const generatedSchema = {
     __typename: { __type: 'String!' },
     cursor: { __type: 'String' },
     node: { __type: 'ContentType' },
-  },
-  Template_Blank: {
-    __typename: { __type: 'String!' },
-    templateName: { __type: 'String' },
-  },
-  Template_PageLargeHeader: {
-    __typename: { __type: 'String!' },
-    templateName: { __type: 'String' },
-  },
-  Template_PageNoSeparators: {
-    __typename: { __type: 'String!' },
-    templateName: { __type: 'String' },
-  },
-  Template_SinglePostNoSeparators: {
-    __typename: { __type: 'String!' },
-    templateName: { __type: 'String' },
   },
   TermNode: {
     __typename: { __type: 'String!' },
@@ -3120,7 +3139,10 @@ export const generatedSchema = {
     generalSettingsTimezone: { __type: 'String' },
     generalSettingsTitle: { __type: 'String' },
     generalSettingsUrl: { __type: 'String' },
+    readingSettingsPageForPosts: { __type: 'Int' },
+    readingSettingsPageOnFront: { __type: 'Int' },
     readingSettingsPostsPerPage: { __type: 'Int' },
+    readingSettingsShowOnFront: { __type: 'String' },
     writingSettingsDefaultCategory: { __type: 'Int' },
     writingSettingsDefaultPostFormat: { __type: 'String' },
     writingSettingsUseSmilies: { __type: 'Boolean' },
@@ -3699,6 +3721,7 @@ export const generatedSchema = {
     },
     discussionSettings: { __type: 'DiscussionSettings' },
     generalSettings: { __type: 'GeneralSettings' },
+    globalSettings: { __type: 'GlobalSettings' },
     mediaItem: {
       __type: 'MediaItem',
       __args: { asPreview: 'Boolean', id: 'ID!', idType: 'MediaItemIdType' },
@@ -3771,7 +3794,13 @@ export const generatedSchema = {
     plugin: { __type: 'Plugin', __args: { id: 'ID!' } },
     plugins: {
       __type: 'RootQueryToPluginConnection',
-      __args: { after: 'String', before: 'String', first: 'Int', last: 'Int' },
+      __args: {
+        after: 'String',
+        before: 'String',
+        first: 'Int',
+        last: 'Int',
+        where: 'RootQueryToPluginConnectionWhereArgs',
+      },
     },
     post: {
       __type: 'Post',
@@ -3937,14 +3966,12 @@ export const generatedSchema = {
     ],
     Commenter: ['CommentAuthor', 'User'],
     ContentRevisionUnion: ['Page', 'Post'],
-    ContentTemplate: [
-      'DefaultTemplate',
-      'Template_Blank',
-      'Template_PageLargeHeader',
-      'Template_PageNoSeparators',
-      'Template_SinglePostNoSeparators',
-    ],
+    ContentTemplate: ['DefaultTemplate'],
     EnqueuedAsset: ['EnqueuedScript', 'EnqueuedStylesheet'],
+    AcfFieldGroup: [
+      'GlobalSettings_Social',
+      'GlobalSettings_Social_socialLinks',
+    ],
     ContentNode: ['MediaItem', 'Page', 'Post'],
     HierarchicalContentNode: ['MediaItem', 'Page'],
     NodeWithAuthor: ['MediaItem', 'Page', 'Post'],

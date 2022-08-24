@@ -19,9 +19,19 @@ import { pageTitle } from 'utils';
 const postsPerPage = 3;
 
 export default function Page() {
+  const query = client.useQuery()
+
+  // Get the general settings title
+  console.log(query.generalSettings.title);
+
+  // Get ACF social media repeater field from global settings option page
+
 
   const { useQuery, usePosts } = client;
   const generalSettings = useQuery().generalSettings;
+  const globalSettings = useQuery().globalSettings;
+  console.log(globalSettings);
+
   const posts = usePosts({
     first: postsPerPage,
     where: {
@@ -33,7 +43,6 @@ export default function Page() {
     mediaDetails: { width: 1200, height: 600 },
     altText: 'Blog Banner',
   };
-
   return (
     <>
       <SEO
