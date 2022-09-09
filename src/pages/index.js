@@ -19,18 +19,15 @@ import { pageTitle } from 'utils';
 const postsPerPage = 3;
 
 export default function Page() {
-  const query = client.useQuery()
-
-  // Get the general settings title
-  console.log(query.generalSettings.title);
+  const { useQuery, usePosts } = client;
+  const query = useQuery();
 
   // Get ACF social media repeater field from global settings option page
+  const generalSettings = query.generalSettings;
+  const globalSettings = query.globalSettings;
 
-
-  const { useQuery, usePosts } = client;
-  const generalSettings = useQuery().generalSettings;
-  const globalSettings = useQuery().globalSettings;
-  console.log(globalSettings);
+  // Retreive social links ACF from the global settings 
+  console.log(globalSettings.social.socialLinks[0].url);
 
   const posts = usePosts({
     first: postsPerPage,
